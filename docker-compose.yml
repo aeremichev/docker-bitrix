@@ -37,6 +37,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#    command: "chmod 0644 /etc/mysql/conf.d/my.cnf && mysqld --sql-mode=''"
     command: mysqld --sql-mode=""
     restart: always
 
@@ -57,6 +58,7 @@ services:
 
     #mysql
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mysql/my.cnf:/etc/my.cnf
 
     #php
       - ./php7/php.ini:/etc/php/7.1/fpm/conf.d/90-php.ini
