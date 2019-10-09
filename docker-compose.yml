@@ -114,7 +114,7 @@ services:
 
       - ./www/:/var/www/sites
 
-      - /etc/localtime:/etc/localtime/:ro
+      #- /etc/localtime:/etc/localtime/:ro
 
 networks:
   proxy_nw:
