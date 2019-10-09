@@ -70,6 +70,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
 #   command: "chmod 0644 /etc/mysql/conf.d/my.cnf && mysqld --sql-mode=''"
     command: mysqld --sql-mode=""
     restart: unless-stopped
