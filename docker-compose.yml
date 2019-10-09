@@ -5,19 +5,16 @@ services:
   #PhpMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: "${COMPOSE_PROJECT_NAME}_pm"
     networks:
       - proxy_nw
     #environment: # если нужно подключаться к другим серверам
     #- PMA_ARBITRARY=1
-    #ports:
-    #  - 8201:80
-    expose:
-      - "80"
-      - "443"
     environment:
-      - VIRTUAL_HOST=pm.pramana.a-kulibin.ru
+      - VIRTUAL_HOST=pm.${HTTP_HOST}
     links:
       - mysql:db
+    restart: unless-stopped
 
   #NodeJs
 #  node:
@@ -29,10 +26,10 @@ services:
 #    volumes_from:
 #      - source
 
-
   php:
     build: ./php7
     image: bitrix/php7
+    container_name: "${COMPOSE_PROJECT_NAME}_php"
     networks:
       - proxy_nw
     working_dir: /var/www
@@ -41,32 +38,28 @@ services:
     links:
       - mysql
       - memcached
-#    restart: always
+    restart: unless-stopped
 
   nginx:
     build: ./nginx
     image: bitrix/nginx
+    container_name: "${COMPOSE_PROJECT_NAME}_nginx"
     networks:
       - proxy_nw
-#   restart: always
+    restart: unless-stopped
     depends_on:
       - source
     volumes_from:
       - source
-#    ports:
-#      - '${HTTP_PORT}:80'
-#      - '${HTTPS_PORT}:443'
-    expose:
-      - "80"
-      - "443"
     environment:
-      - VIRTUAL_HOST=pramana.a-kulibin.ru,pramana2.a-kulibin.ru
+      - VIRTUAL_HOST=${HTTP_HOST}
     links:
       - php
-
+    #command: sh -c "envsubst \"`env | awk -F = '{printf \" $$%s\", $$1}'`\" < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
 
   mysql:
     image: mysql:5.7
+    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
     networks:
       - proxy_nw
     volumes_from:
@@ -76,23 +69,26 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
 #   command: "chmod 0644 /etc/mysql/conf.d/my.cnf && mysqld --sql-mode=''"
     command: mysqld --sql-mode=""
-#   restart: always
+    restart: unless-stopped
 
   memcached:
     image: memcached:alpine
+    container_name: "${COMPOSE_PROJECT_NAME}_memcached"
     networks:
       - proxy_nw
-#   restart: always
+    restart: unless-stopped
     volumes_from:
       - source
 
   source:
     image: alpine:latest
+    container_name: "${COMPOSE_PROJECT_NAME}_source"
     networks:
       - proxy_nw
-#    restart: always
+    restart: unless-stopped
     volumes:
     #nginx
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
